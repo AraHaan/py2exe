@@ -45,7 +45,7 @@ else:
 ##              ("PYTHONCOM", '\\"pythoncom%d%d.dll\\"' % sys.version_info[:2]),
               ("_CRT_SECURE_NO_WARNINGS", '1'),]
 
-macros.append(("Py_BUILD_CORE_MODULE", '1'))
+#macros.append(("Py_BUILD_CORE", '1'))
 
 extra_compile_args = []
 extra_link_args = []
@@ -68,6 +68,7 @@ _memimporter = Extension("_memimporter",
                         "source/MemoryModule.c",
                         "source/MyLoadLibrary.c",
                         "source/actctx.c",
+                        "source/import_mini.c",
                         ],
                          libraries=["user32", "shell32"],
                          define_macros=macros + [("STANDALONE", "1")],
@@ -91,7 +92,7 @@ if __name__ == "__main__":
           setup_requires=["wheel", "cachetools", "pefile", "packaging"],
           install_requires=["cachetools", "pefile"],
           platforms="Windows",
-          python_requires='>=3.8, <3.12',
+          python_requires='>=3.8, <3.14',
 
           classifiers=[
               "Development Status :: 4 - Beta",
@@ -105,6 +106,8 @@ if __name__ == "__main__":
               "Programming Language :: Python :: 3.9",
               "Programming Language :: Python :: 3.10",
               "Programming Language :: Python :: 3.11",
+              "Programming Language :: Python :: 3.12",
+              "Programming Language :: Python :: 3.13",
               "Programming Language :: Python :: Implementation :: CPython",
               "Topic :: Software Development",
               "Topic :: Software Development :: Libraries",
