@@ -1,23 +1,21 @@
 #!/usr/bin/python3.3-32
 # -*- coding: utf-8 -*-
-import pkg_resources
-from .dllfinder import Scanner, pydll
-
 import io
 import logging
 import marshal
 import os
 import pkgutil
-import pkg_resources
 import shutil
 import struct
 import sys
 import zipfile
 
 from argparse import Namespace
+from importlib.metadata import distribution, PackageNotFoundError
 from importlib.util import MAGIC_NUMBER
 from glob import glob
 
+from .dllfinder import Scanner, pydll
 from .resources import UpdateResources
 from .versioninfo import Version
 from .icons import BuildIcons
@@ -153,6 +151,15 @@ class Runtime(object):
 ##             dst = self.build_service(target, self.get_service_template(),
 ##                                      arcname)
 ##             self.service_exe_files.append(dst)
+
+        if sys.version_info >= (3,12,0):
+            try:
+                assert self.options.bundle_files == 3
+            except AssertionError:
+                error_msg = 'Values of bundlefiles<3 are incompatible with Python 3.12+!'
+                logger.error(error_msg)
+                logger.error('See https://github.com/py2exe/py2exe/issues/191#issuecomment-1774211437 for further details.')
+                raise RuntimeError(error_msg)
 
         if self.options.bundle_files < 3:
             self.bootstrap_modules.add("zipextimporter")
@@ -479,8 +486,8 @@ class Runtime(object):
             # copy egg-info
             if mod.__path__ is not None and mod.__name__[0] != '_': # attempt to select valid packages
                 try:
-                    dist = pkg_resources.get_distribution(mod.__name__)
-                    dist_path = dist._provider.egg_info
+                    dist = distribution(mod.__name__)
+                    dist_path = str(dist._path)
                     base = dist_path.rsplit(os.path.sep, 1)[0]
                     name = dist_path.split(base + os.path.sep)[1]
 
@@ -492,7 +499,7 @@ class Runtime(object):
                     for p in paths:
                         name = p.split(base + os.path.sep)[1]
                         arc.write(p, name)
-                except pkg_resources.DistributionNotFound:
+                except PackageNotFoundError:
                     pass
 
         # data files to be zipped from modulefinder

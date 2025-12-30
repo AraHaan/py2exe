@@ -188,7 +188,6 @@ if __name__ == "__main__":
           install_requires=["cachetools", "pefile"],
           platforms="Windows",
           python_requires='>=3.8, <3.15',
-
           classifiers=[
               "Development Status :: 4 - Beta",
               "Environment :: Console",
@@ -197,7 +196,6 @@ if __name__ == "__main__":
               "Operating System :: Microsoft :: Windows",
               "Programming Language :: C",
               "Programming Language :: Python :: 3",
-              "Programming Language :: Python :: 3.8",
               "Programming Language :: Python :: 3.9",
               "Programming Language :: Python :: 3.10",
               "Programming Language :: Python :: 3.11",
@@ -215,6 +213,6 @@ if __name__ == "__main__":
           distclass = Dist,
           cmdclass = cmdclass,
           interpreters = interpreters,
-          py_modules=['zipextimporter'],
+          py_modules=['py2exe_setuptools', 'zipextimporter'],
           packages=['py2exe', 'py2exe.vendor'],
           )
