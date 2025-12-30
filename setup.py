@@ -26,15 +26,21 @@ from py2exe_setuptools import Dist, Interpreter, BuildInterpreters
 if 'MSC' in sys.version:
     python_dll_name = '\"python%d%d.dll\"' % sys.version_info[:2]
     python_dll_name_debug = '\"python%d%d_d.dll\"' % sys.version_info[:2]
+    python_lib_name = "python%d%d" % sys.version_info[:2]
+    python_lib_name_debug = "python%d%d_d" % sys.version_info[:2]
 else:
     python_dll_name = '\"libpython%d.%d.dll\"' % sys.version_info[:2]
     python_dll_name_debug = '\"libpython%d.%d_d.dll\"' % sys.version_info[:2]
+    python_lib_name = "libpython%d.%d" % sys.version_info[:2]
+    python_lib_name_debug = "libpython%d.%d_d" % sys.version_info[:2]
+
 
 def _is_debug_build():
     for ext in machinery.all_suffixes():
         if ext == "_d.pyd":
             return True
     return False
+
 
 if _is_debug_build():
     macros = [("PYTHONDLL", python_dll_name_debug),
@@ -90,7 +96,8 @@ run_ctypes_dll = Interpreter("py2exe.run_ctypes_dll",
 
                               "source/python-dynload.c",
                               ],
-                             libraries=["user32", "shell32"],
+                             libraries=["user32", "shell32",
+                                        python_lib_name_debug if _is_debug_build() else python_lib_name],
                              export_symbols=["DllCanUnloadNow,PRIVATE",
                                              "DllGetClassObject,PRIVATE",
                                              "DllRegisterServer,PRIVATE",
@@ -115,7 +122,7 @@ run = Interpreter("py2exe.run",
 
                    "source/python-dynload.c",
                    ],
-                  libraries=["user32", "shell32"],
+                  libraries=["user32", "shell32", python_lib_name_debug if _is_debug_build() else python_lib_name],
                   define_macros=macros,
                   extra_compile_args=extra_compile_args,
                   extra_link_args=extra_link_args + subsys_console + unicode_flags,
@@ -134,7 +141,7 @@ run_w = Interpreter("py2exe.run_w",
 
                      "source/python-dynload.c",
                      ],
-                    libraries=["user32", "shell32"],
+                    libraries=["user32", "shell32", python_lib_name_debug if _is_debug_build() else python_lib_name],
                     define_macros=macros,
                     extra_compile_args=extra_compile_args,
                     extra_link_args=extra_link_args + subsys_windows,
