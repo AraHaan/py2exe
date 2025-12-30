@@ -54,6 +54,7 @@ else:
 macros.append(("Py_BUILD_CORE", '1'))
 macros.append(("PYTHONHOME", ''))
 macros.append(("PYTHONPATH", ''))
+macros.append(("EMBED_MEMIMPORTER", ''))
 
 extra_compile_args = []
 extra_link_args = []
