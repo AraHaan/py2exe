@@ -26,15 +26,21 @@ from setuptools.extension import Extension
 if 'MSC' in sys.version:
     python_dll_name = '\"python%d%d.dll\"' % sys.version_info[:2]
     python_dll_name_debug = '\"python%d%d_d.dll\"' % sys.version_info[:2]
+    python_lib_name = "python%d%d" % sys.version_info[:2]
+    python_lib_name_debug = "python%d%d_d" % sys.version_info[:2]
 else:
     python_dll_name = '\"libpython%d.%d.dll\"' % sys.version_info[:2]
     python_dll_name_debug = '\"libpython%d.%d_d.dll\"' % sys.version_info[:2]
+    python_lib_name = "libpython%d.%d" % sys.version_info[:2]
+    python_lib_name_debug = "libpython%d.%d_d" % sys.version_info[:2]
+
 
 def _is_debug_build():
     for ext in machinery.all_suffixes():
         if ext == "_d.pyd":
             return True
     return False
+
 
 if _is_debug_build():
     macros = [("PYTHONDLL", python_dll_name_debug),
@@ -45,7 +51,7 @@ else:
 ##              ("PYTHONCOM", '\\"pythoncom%d%d.dll\\"' % sys.version_info[:2]),
               ("_CRT_SECURE_NO_WARNINGS", '1'),]
 
-#macros.append(("Py_BUILD_CORE", '1'))
+macros.append(("Py_BUILD_CORE_MODULE", '1'))
 
 extra_compile_args = []
 extra_link_args = []
@@ -70,7 +76,8 @@ _memimporter = Extension("_memimporter",
                         "source/actctx.c",
                         "source/import_mini.c",
                         ],
-                         libraries=["user32", "shell32"],
+                         libraries=["user32", "shell32",
+                                    python_lib_name_debug if _is_debug_build() else python_lib_name],
                          define_macros=macros + [("STANDALONE", "1")],
                          extra_compile_args=extra_compile_args,
                          extra_link_args=extra_link_args,
