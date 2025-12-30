@@ -17,6 +17,7 @@
  */
 #include <internal/pycore_importdl.h>
 #include <internal/pycore_object.h>
+#include <internal/pycore_interp.h>
 
 #define EXTENSIONS(interp) (interp)->runtime->imports.extensions
 #define MODULES_BY_INDEX(interp) \
@@ -305,7 +306,11 @@ hashtable_key_from_2_strings(PyObject *str1, PyObject *str2, const char sep)
 static Py_uhash_t
 hashtable_hash_str(const void *key)
 {
+#if (PY_VERSION_HEX >= 0x030E00A0)
+    return Py_HashBuffer(key, strlen((const char*)key));
+#else
     return _Py_HashBytes(key, strlen((const char *)key));
+#endif
 }
 
 static int
