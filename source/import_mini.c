@@ -23,7 +23,7 @@
 #define MODULES_BY_INDEX(interp) \
     (interp)->imports.modules_by_index
 
-#if (PY_VERSION_HEX >= 0x030D0000 && PY_VERSION_HEX < 0x030E0000)
+#if (PY_VERSION_HEX < 0x030E0000)
 void
 _Py_SetImmortalUntracked(PyObject *op)
 {
@@ -600,16 +600,21 @@ int _PyImport_FixupExtensionObject(PyObject *m, PyObject *name1, PyObject *name2
   return 0;
 }
 
+#endif
+/*
+ * to compile _memimporter in python < 3.13 it must be outside of the
+ * PY_VERSION_HEX >= 3.13 conditional compile block above.
+ */
 #ifndef Py_BUILD_CORE_BUILTIN
 const char*
 _PyImport_SwapPackageContext(const char* newcontext)
 {
+#if (PY_VERSION_HEX >= 0x030C0000)
 	// PyGILState_STATE gil_state = PyGILState_Ensure();  // Ensure GIL is held
 	PyInterpreterState *is = PyInterpreterState_Get();
 #ifndef HAVE_THREAD_LOCAL
 	PyThread_acquire_lock(is->runtime->imports.extensions.mutex, WAIT_LOCK);
 #endif
-#if (PY_VERSION_HEX >= 0x030C0000)
 	const char* oldcontext = (is->runtime->imports.pkgcontext);
 	(is->runtime->imports.pkgcontext) = newcontext;
 #else
@@ -617,12 +622,13 @@ _PyImport_SwapPackageContext(const char* newcontext)
 	const char* oldcontext = _Py_PackageContext;
 	_Py_PackageContext = newcontext;
 #endif
+#if (PY_VERSION_HEX >= 0x030C0000)
 #ifndef HAVE_THREAD_LOCAL
 	PyThread_release_lock(is->runtime->imports.extensions.mutex);
+#endif
 #endif
 
 	// PyGILState_Release(gil_state);  // Release the GIL
 	return oldcontext;
 }
-#endif
 #endif
