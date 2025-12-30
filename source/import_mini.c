@@ -23,6 +23,27 @@
 #define MODULES_BY_INDEX(interp) \
     (interp)->imports.modules_by_index
 
+#if (PY_VERSION_HEX >= 0x030D0000 && PY_VERSION_HEX < 0x030E0000)
+void
+_Py_SetImmortalUntracked(PyObject *op)
+{
+#ifdef Py_DEBUG
+    // For strings, use _PyUnicode_InternImmortal instead.
+    if (PyUnicode_CheckExact(op)) {
+        assert(PyUnicode_CHECK_INTERNED(op) == SSTATE_INTERNED_IMMORTAL
+            || PyUnicode_CHECK_INTERNED(op) == SSTATE_INTERNED_IMMORTAL_STATIC);
+    }
+#endif
+#ifdef Py_GIL_DISABLED
+    op->ob_tid = _Py_UNOWNED_TID;
+    op->ob_ref_local = _Py_IMMORTAL_REFCNT_LOCAL;
+    op->ob_ref_shared = 0;
+#else
+    op->ob_refcnt = _Py_IMMORTAL_REFCNT;
+#endif
+}
+#endif
+
 static bool
 is_interpreter_isolated(PyInterpreterState *interp)
 {
