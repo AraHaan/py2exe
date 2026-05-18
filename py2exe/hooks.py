@@ -246,6 +246,34 @@ def hook__socket(finder, module):
     if sys.version_info >= (3,6,0) and sys.version_info < (3,12,0):
         finder.import_hook("imp")
 
+def hook_pyphen(finder, module):
+    """pyphen locates its dictionary files via importlib.resources or __file__,
+    neither of which works inside a frozen library.zip.
+    This hook copies hyph_*.dic files next to the executable and patches
+    pyphen.dictionaries to resolve from there at runtime.
+    """
+    import pyphen
+    import glob as _glob
+    DEST_DIR = "pyphenDictionaries"
+    source_dir = os.path.join(os.path.dirname(pyphen.__file__), "dictionaries")
+    for dic_file in _glob.glob(os.path.join(source_dir, "hyph_*.dic")):
+        finder.add_datafile(
+            os.path.join(DEST_DIR, os.path.basename(dic_file)),
+            dic_file,
+        )
+    finder.add_bootcode("""
+def _patch_pyphen():
+    import pyphen
+    import os
+    import sys
+    from pathlib import Path
+    pyphen.dictionaries = Path(os.path.dirname(sys.executable)) / "pyphenDictionaries"
+
+_patch_pyphen()
+del _patch_pyphen
+""")
+
+
 def hook_pyreadline(finder, module):
     """
     """
