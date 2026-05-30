@@ -184,6 +184,15 @@ def patch_cffi():
 patch_cffi()
 del patch_cffi
 """)
+  
+
+def hook_ctypes(finder, module):
+    if sys.version_info >= (3,14,0):
+        depth = getattr(finder,"recursion_depth_ctypes", 0)
+        if depth == 0:
+            finder.recursion_depth_ctypes = depth + 1
+            finder.import_hook("ctypes._layout")
+            finder.recursion_depth_ctypes = depth
 
 
 def hook_multiprocessing(finder, module):
