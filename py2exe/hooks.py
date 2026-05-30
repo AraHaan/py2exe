@@ -670,6 +670,7 @@ def hook_pandas(finder, module):
     if depth==0:
         finder.recursion_depth_pandas = depth + 1
         finder.import_hook("pandas._libs.tslibs.base")
+        finder.import_hook("pandas._libs._cyutility")
         finder.recursion_depth_pandas = depth
 
     from pandas import __version__ as pandas_version_str
