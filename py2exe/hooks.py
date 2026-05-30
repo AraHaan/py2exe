@@ -279,8 +279,11 @@ def hook_pywintypes(finder, module):
 def hook_charset_normalizer(finder, module):
     """charset_normalizer.md imports charset_normalizer.md__mypyc.
     """
+    from packaging import version as pkgversion
     import charset_normalizer
-    if charset_normalizer.VERSION[0] == "3":
+
+    chatset_version = pkgversion.parse(charset_normalizer.__version__)
+    if pkgversion.parse('3') <= chatset_version <= pkgversion.parse('3.4.4'):
         finder.add_module(
             "charset_normalizer.md__mypyc",
             charset_normalizer.md__mypyc.__file__
