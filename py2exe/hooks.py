@@ -184,7 +184,7 @@ def patch_cffi():
 patch_cffi()
 del patch_cffi
 """)
-  
+
 
 def hook_ctypes(finder, module):
     if sys.version_info >= (3,14,0):
@@ -858,7 +858,7 @@ def hook_scipy__lib_array_api_compat_numpy(finder, module):
     import ast
     tree = ast.parse(module.__source__)
 
-    assign_node = ast.Assign(targets=[ast.Name(id='__package__', ctx=ast.Store())], value=ast.Constant(s='scipy._lib.array_api_compat.numpy'))
+    assign_node = ast.Assign(targets=[ast.Name(id='__package__', ctx=ast.Store())], value=ast.Constant(value='scipy._lib.array_api_compat.numpy'))
     tree.body.insert(0, assign_node)
     ast.fix_missing_locations(tree)
 
