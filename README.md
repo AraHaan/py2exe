@@ -16,7 +16,8 @@ The detailed changelog is published on [GitHub](https://github.com/py2exe/py2exe
 Version 0.14.1.0:
 - Add support for Python 3.14
 - Drop support for Python 3.9
-- Fixes for the `charset-normalizer`, `ctypes`, `pandas`, and `scipy` hooks.
+- Add hook for `pyphen`
+- Fixes for the `charset-normalizer`, `ctypes`, `pandas`, and `scipy` hooks
 
 Version 0.14.0.0:
 - Add support for Python 3.12 and 3.13
